@@ -15,9 +15,9 @@ const capabilities = [
   },
   {
     number: "03",
-    title: "UI / UX",
+    title: "UI/UX & Graphic Design",
     description:
-      "Designing interfaces using Figma with focus on hierarchy, usability, interaction, and visual consistency.",
+      "Designing intuitive interfaces and creating custom web assets with Figma, Photoshop, and Illustrator.",
   },
   {
     number: "04",
@@ -25,7 +25,7 @@ const capabilities = [
     description:
       "Turning real-world business and organizational problems into structured digital solutions.",
   },
-]
+];
 
 export default function Capabilities() {
   return (
@@ -68,5 +68,5 @@ export default function Capabilities() {
         </div>
       </div>
     </section>
-  )
+  );
 }

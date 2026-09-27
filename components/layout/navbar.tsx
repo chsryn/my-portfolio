@@ -36,10 +36,7 @@ export default function Navbar() {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-[22px] lg:px-10">
-        <Link
-          href="/"
-          className="text-[13px] font-semibold tracking-[-0.02em]"
-        >
+        <Link href="/" className="text-[13px] font-semibold tracking-[-0.02em]">
           Chasryn
         </Link>
 

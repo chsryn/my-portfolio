@@ -1,3 +1,4 @@
+import Image from "next/image";
 import ScrollReveal from "@/components/animations/scroll-reveal";
 
 const experiences = [
@@ -85,13 +86,24 @@ export default function Experience() {
               <p className="font-mono text-xs tracking-wide text-faint">
                 2022 — Present
               </p>
-              <div>
-                <h3 className="text-[17px] font-semibold leading-tight tracking-[-0.02em] md:text-[18px]">
-                  Universitas Negeri Gorontalo
-                </h3>
-                <p className="mt-1.5 text-[14px] leading-6 text-muted">
-                  Bachelor of Science in Information, Information System
-                </p>
+              <div className="flex items-center justify-between gap-6">
+                <div className="min-w-0">
+                  <h3 className="text-[17px] font-semibold leading-tight tracking-[-0.02em] md:text-[18px]">
+                    Universitas Negeri Gorontalo
+                  </h3>
+                  <p className="mt-1.5 text-[14px] leading-6 text-muted">
+                    Bachelor of Science in Information, Information System
+                  </p>
+                </div>
+                <div className="shrink-0 pr-1 md:pr-4">
+                  <Image
+                    src="/ung.png"
+                    alt="Universitas Negeri Gorontalo"
+                    width={96}
+                    height={96}
+                    className="h-16 w-16 object-contain opacity-80 md:h-24 md:w-24"
+                  />
+                </div>
               </div>
             </div>
           </div>

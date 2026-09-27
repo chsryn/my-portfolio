@@ -17,7 +17,9 @@ export default function Contact() {
 
           <div className="mt-8 flex flex-wrap gap-5">
             <a
-              href="mailto:your-email@example.com"
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=syachran.nd@gmail.com&su=Project%20Inquiry&body=Hi%20Syachran%2C%0A%0AI%27d%20like%20to%20discuss%20a%20project."
+              target="_blank"
+              rel="noopener noreferrer"
               className="group inline-flex items-center gap-1.5 text-sm font-medium tracking-wide underline decoration-foreground/25 underline-offset-4 transition-colors hover:decoration-foreground"
             >
               Email
@@ -27,7 +29,7 @@ export default function Contact() {
             </a>
 
             <a
-              href="https://github.com/chsrynini"
+              href="https://github.com/chsryn"
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex items-center gap-1.5 text-sm font-medium tracking-wide underline decoration-foreground/25 underline-offset-4 transition-colors hover:decoration-foreground"
@@ -58,5 +60,5 @@ export default function Contact() {
         </div>
       </ScrollReveal>
     </section>
-  )
+  );
 }

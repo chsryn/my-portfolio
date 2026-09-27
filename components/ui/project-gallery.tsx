@@ -14,9 +14,12 @@ function pad2(n: number) {
 
 export default function ProjectGallery({ images, title }: ProjectGalleryProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const [active, setActive] = useState(0);
   const [failed, setFailed] = useState<Set<number>>(new Set());
+  const [preview, setPreview] = useState<number | null>(null);
   const isDown = useRef(false);
+  const dragged = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
 
@@ -40,6 +43,22 @@ export default function ProjectGallery({ images, title }: ProjectGalleryProps) {
     };
   }, [updateActive]);
 
+  // lightbox: Escape to close + lock background scroll
+  useEffect(() => {
+    if (preview === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPreview(null);
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [preview]);
+
   const scrollTo = useCallback(
     (idx: number) => {
       const el = scrollerRef.current;
@@ -57,6 +76,7 @@ export default function ProjectGallery({ images, title }: ProjectGalleryProps) {
     const el = scrollerRef.current;
     if (!el) return;
     isDown.current = true;
+    dragged.current = false;
     el.setPointerCapture(e.pointerId);
     startX.current = e.clientX - el.offsetLeft;
     scrollLeft.current = el.scrollLeft;
@@ -69,6 +89,7 @@ export default function ProjectGallery({ images, title }: ProjectGalleryProps) {
     e.preventDefault();
     const x = e.clientX - el.offsetLeft;
     const walk = x - startX.current;
+    if (Math.abs(walk) > 8) dragged.current = true;
     el.scrollLeft = scrollLeft.current - walk;
   };
 
@@ -99,9 +120,17 @@ export default function ProjectGallery({ images, title }: ProjectGalleryProps) {
           {images.map((src, i) => (
             <div
               key={`${src}-${i}`}
-              className="flex w-full shrink-0 snap-center items-center justify-center bg-[#0f2747]/40"
+              onClick={() => {
+                if (dragged.current) {
+                  dragged.current = false;
+                  return;
+                }
+                if (!failed.has(i)) setPreview(i);
+              }}
+              className="flex w-full shrink-0 cursor-zoom-in snap-center items-center justify-center bg-[#0f2747]/40"
             >
-              <div className="relative aspect-[16/9.5] w-full md:aspect-[16/8.5]">
+              {/* presentation frame — fixed 16:9, height derived from responsive width */}
+              <div className="relative aspect-video w-full">
                 {failed.has(i) ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#0f2747]/60 px-6 text-center">
                     <p className="font-mono text-xs uppercase tracking-[0.14em] text-faint">
@@ -115,7 +144,7 @@ export default function ProjectGallery({ images, title }: ProjectGalleryProps) {
                     alt={`${title} — image ${pad2(i + 1)}`}
                     fill
                     sizes="(max-width: 768px) 100vw, 1200px"
-                    className="object-contain"
+                    className="object-contain object-center"
                     draggable={false}
                     onError={() =>
                       setFailed((prev) => {
@@ -162,8 +191,45 @@ export default function ProjectGallery({ images, title }: ProjectGalleryProps) {
 
       {!single && (
         <p className="border-t border-line py-2 text-center font-mono text-xs uppercase tracking-[0.14em] text-faint/70">
-          Drag or swipe to explore
+          Drag or swipe to explore — click to enlarge
         </p>
+      )}
+
+      {/* fullscreen preview — natural aspect ratio, never cropped */}
+      {preview !== null && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${title} — image ${pad2(preview + 1)} preview`}
+          onClick={() => setPreview(null)}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4 sm:p-8"
+        >
+          <button
+            ref={closeRef}
+            type="button"
+            aria-label="Close preview"
+            onClick={() => setPreview(null)}
+            className="absolute right-4 top-4 grid h-11 w-11 place-items-center border border-line bg-background text-base text-foreground transition-colors hover:bg-foreground hover:text-background"
+          >
+            ✕
+          </button>
+          <div
+            className="relative h-[80vh] w-full max-w-6xl sm:h-[85vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={images[preview]}
+              alt={`${title} — image ${pad2(preview + 1)}`}
+              fill
+              sizes="90vw"
+              className="object-contain object-center"
+              draggable={false}
+            />
+          </div>
+          <span className="absolute bottom-4 left-1/2 -translate-x-1/2 border border-line bg-background px-2.5 py-1 font-mono text-xs tracking-wide text-faint">
+            {pad2(preview + 1)} / {pad2(images.length)}
+          </span>
+        </div>
       )}
     </div>
   );

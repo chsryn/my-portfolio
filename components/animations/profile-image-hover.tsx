@@ -1,92 +1,54 @@
 "use client";
 
 import Image from "next/image";
-import { useLayoutEffect, useRef } from "react";
+import { useState } from "react";
 
-import { gsap, hasFinePointer, prefersReducedMotion } from "./gsap";
+import { hasFinePointer, prefersReducedMotion } from "./gsap";
 
 export default function ProfileImageHover() {
-  const ref = useRef<HTMLDivElement>(null);
+  const [flipped, setFlipped] = useState(false);
 
-  useLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const ctx = gsap.context(() => {
-      const profile = el.querySelector(".hero-profile-base");
-      const real = el.querySelector(".hero-profile-real");
-      const target = el.querySelector<HTMLElement>(".hero-hover-target");
-      if (!profile || !real || !target) return;
-
-      if (!hasFinePointer() || prefersReducedMotion()) return;
-
-      gsap.set(real, { autoAlpha: 0 });
-
-      const enter = () => {
-        gsap.to(real, {
-          autoAlpha: 1,
-          duration: 1.3,
-          ease: "power2.inOut",
-          overwrite: "auto",
-        });
-        gsap.to(profile, {
-          autoAlpha: 0,
-          duration: 1.3,
-          ease: "power2.inOut",
-          overwrite: "auto",
-        });
-      };
-
-      const leave = () => {
-        gsap.to(real, {
-          autoAlpha: 0,
-          duration: 1.3,
-          ease: "power2.inOut",
-          overwrite: "auto",
-        });
-        gsap.to(profile, {
-          autoAlpha: 1,
-          duration: 1.3,
-          ease: "power2.inOut",
-          overwrite: "auto",
-        });
-      };
-
-      target.addEventListener("mouseenter", enter);
-      target.addEventListener("mouseleave", leave);
-
-      return () => {
-        target.removeEventListener("mouseenter", enter);
-        target.removeEventListener("mouseleave", leave);
-      };
-    }, el);
-
-    return () => ctx.revert();
-  }, []);
+  const canHover = () => hasFinePointer() && !prefersReducedMotion();
 
   return (
-    <div ref={ref}>
-      <div className="hero-hover-target relative aspect-square overflow-hidden">
-        <div className="hero-parallax absolute inset-0">
-          <Image
-            src="/profile.png"
-            alt="Muh. Syachran A. Niode"
-            fill
-            priority
-            unoptimized
-            className="hero-profile-base object-contain"
-            sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 400px, 480px"
-          />
+    <div>
+      <div
+        className="hero-hover-target relative aspect-square overflow-hidden [perspective:1200px]"
+        onMouseEnter={() => {
+          if (canHover()) setFlipped(true);
+        }}
+        onMouseLeave={() => {
+          if (canHover()) setFlipped(false);
+        }}
+      >
+        <div
+          className={`absolute inset-0 [transform-style:preserve-3d] transition-transform duration-[800ms] ease-[cubic-bezier(0.65,0,0.35,1)] ${
+            flipped ? "[transform:rotateY(180deg)]" : "[transform:rotateY(0deg)]"
+          }`}
+        >
+          <div className="hero-profile-base absolute inset-0 [backface-visibility:hidden]">
+            <Image
+              src="/profile.png"
+              alt="Muh. Syachran A. Niode"
+              fill
+              priority
+              unoptimized
+              className="object-contain"
+              sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 400px, 480px"
+            />
+          </div>
 
-          <Image
-            src="/real-profile.png"
-            alt=""
-            fill
-            priority
-            unoptimized
-            className="hero-profile-real object-contain opacity-0"
-            sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 400px, 480px"
-          />
+          <div className="hero-profile-real absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+            <Image
+              src="/real-profile.png"
+              alt=""
+              fill
+              priority
+              unoptimized
+              className="object-contain"
+              sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 400px, 480px"
+            />
+          </div>
         </div>
       </div>
     </div>
